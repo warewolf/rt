@@ -3,9 +3,13 @@ my %number_column = (
 );
 my $move_attributes = sub {
     my ($table, $type, $column) = @_;
+    my $db_type = RT->Config->Get('DatabaseType');
     my $query;
-    if ( $number_column{ $column } && RT->Config->Get('DatabaseType') eq 'Oracle' ) {
+    if ( $number_column{ $column } && $db_type eq 'Oracle' ) {
         $query = "UPDATE $table SET $column = (SELECT TO_NUMBER(Content) FROM Attributes WHERE"
+            ." Name = ? AND ObjectType = ? AND $table.id = Attributes.ObjectId)";
+    } elsif ( $number_column{ $column } && $db_type eq 'Pg' ) {
+        $query = "UPDATE $table SET $column = (SELECT CAST(Content AS INTEGER) FROM Attributes WHERE"
             ." Name = ? AND ObjectType = ? AND $table.id = Attributes.ObjectId)";
     } else {
         $query = "UPDATE $table SET $column = (SELECT Content FROM Attributes WHERE"
