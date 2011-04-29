@@ -290,15 +290,6 @@ $session{'CurrentSearchHash'} = {
 };
 
 
-# Show the results, if we were asked.
-
-if ( $ARGS{'DoSearch'} ) {
-    $m->comp( 'Results.html', %query, SavedChartSearchId => $ARGS{'SavedChartSearchId'}, );
-    $m->comp( '/Elements/Footer' );
-    $m->abort;
-}
-
-
 # Build a querystring for the tabs
 
 my $QueryString = '';
@@ -308,6 +299,12 @@ if ($NewQuery) {
 elsif ( $query{'Query'} ) {
     $QueryString = $m->comp('/Elements/QueryString', %query );
 }
+
+# Show the results, if we were asked.
+if ( $ARGS{'DoSearch'} ) {
+    RT::Interface::Web::Redirect($RT::WebURL.'Search/Results.html?'.$QueryString);
+}
+
 
 </%INIT>
 
